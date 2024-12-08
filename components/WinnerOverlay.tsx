@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, HTMLMotionProps, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
 
@@ -6,6 +6,12 @@ interface WinnerOverlayProps {
   winner: string | null;
   onClose: () => void;
 }
+
+type MotionDivProps = HTMLMotionProps<'div'> & React.HTMLAttributes<HTMLDivElement>;
+const MotionDiv = motion.div as React.FC<MotionDivProps>;
+
+type MotionButtonProps = HTMLMotionProps<'button'> & React.ButtonHTMLAttributes<HTMLButtonElement>;
+const MotionButton = motion.button as React.FC<MotionButtonProps>;
 
 export default function WinnerOverlay({ winner, onClose }: WinnerOverlayProps) {
   useEffect(() => {
@@ -21,7 +27,7 @@ export default function WinnerOverlay({ winner, onClose }: WinnerOverlayProps) {
   return (
     <AnimatePresence>
       {winner && (
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -33,33 +39,65 @@ export default function WinnerOverlay({ winner, onClose }: WinnerOverlayProps) {
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.5, y: 100 }}
             transition={{ type: 'spring', damping: 15 }}
-            className='bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 p-8 rounded-xl shadow-2xl text-white text-center'
-            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'linear-gradient(to right, #9333ea, #ec4899, #ef4444)',
+              padding: '2rem',
+              borderRadius: '0.75rem',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              color: 'white',
+              textAlign: 'center',
+            }}
           >
-            <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className='text-4xl font-bold mb-4'>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              style={{
+                fontSize: '2.25rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem',
+              }}
+            >
               🎉 축하합니다! 🎉
             </motion.h2>
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
-              className='text-6xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-white p-4'
+              style={{
+                fontSize: '3.75rem',
+                fontWeight: 800,
+                marginBottom: '1.5rem',
+                backgroundClip: 'text',
+                color: 'transparent',
+                backgroundImage: 'linear-gradient(to right, #facc15, #ffffff)',
+                padding: '1rem',
+              }}
             >
               {winner}
             </motion.div>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className='text-xl'>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} style={{ fontSize: '1.25rem' }}>
               당신이 선택되었습니다!
             </motion.p>
-            <motion.button
+            <MotionButton
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className='mt-8 px-6 py-2 bg-white text-purple-600 rounded-full font-semibold text-lg hover:bg-gray-100 transition-colors'
+              style={{
+                marginTop: '2rem',
+                padding: '0.5rem 1.5rem',
+                backgroundColor: 'white',
+                color: '#9333ea',
+                borderRadius: '9999px',
+                fontWeight: 600,
+                fontSize: '1.125rem',
+                transition: 'background-color 0.2s',
+              }}
               onClick={onClose}
             >
               닫기
-            </motion.button>
+            </MotionButton>
           </motion.div>
-        </motion.div>
+        </MotionDiv>
       )}
     </AnimatePresence>
   );

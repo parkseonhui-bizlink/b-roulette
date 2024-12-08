@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, ComponentProps } from 'react';
 import { motion } from 'framer-motion';
 import { useMemberContext } from '@/contexts/MemberContext';
 import WinnerOverlay from './WinnerOverlay';
@@ -61,6 +61,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
 
   const colors = ['#FFB800', '#FF4B4B', '#FFFFFF', '#FFB4B4'];
 
+  const MotionButton = motion.button as React.ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement> & ComponentProps<typeof motion.button>>;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
       <div
@@ -99,7 +100,6 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           animate={{ rotate: -360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
         />
-
         <div
           style={{
             display: 'flex',
@@ -133,8 +133,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
             </div>
           ))}
         </div>
-
-        <motion.button
+        <MotionButton
           onClick={spin}
           disabled={isSpinning || activeMembers.length === 0}
           style={{
@@ -152,7 +151,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           whileTap={{ scale: 0.95 }}
         >
           {isSpinning ? '선택 중...' : '랜덤 선택'}
-        </motion.button>
+        </MotionButton>
       </div>
 
       <WinnerOverlay winner={winner} onClose={closeOverlay} />
