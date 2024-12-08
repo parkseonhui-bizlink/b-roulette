@@ -2,18 +2,25 @@
 
 import { useState } from 'react';
 import { useMemberContext } from '@/contexts/MemberContext';
+import { Search } from 'lucide-react';
 
 export default function MemberManager() {
-  const { members, addMember, removeMember, toggleExclude } = useMemberContext();
+  const { members, addMember, removeMember, toggleExclude, loading, error } = useMemberContext();
   const [newMemberName, setNewMemberName] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newMemberName.trim()) {
-      addMember(newMemberName.trim());
+      await addMember(newMemberName.trim());
       setNewMemberName('');
     }
   };
+
+  const filteredMembers = members.filter((member) => member.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  if (loading) return <div>Loading members...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className='bg-white rounded-xl shadow-xl p-8 w-full max-w-2xl mx-auto'>
@@ -24,14 +31,27 @@ export default function MemberManager() {
           value={newMemberName}
           onChange={(e) => setNewMemberName(e.target.value)}
           placeholder='새 멤버 이름'
-          className='flex-grow p-2 border rounded'
+          className='flex-grow p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
         />
-        <button type='submit' className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors'>
+        <button
+          type='submit'
+          className='bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500'
+        >
           추가
         </button>
       </form>
+      <div className='relative mb-4'>
+        <input
+          type='text'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder='멤버 검색...'
+          className='w-full p-2 pl-10 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
+        />
+        <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
+      </div>
       <ul className='space-y-2'>
-        {members.map((member) => (
+        {filteredMembers.map((member) => (
           <li key={member.id} className='flex items-center justify-between p-2 bg-gray-100 rounded'>
             <span className={member.excluded ? 'line-through text-gray-500' : ''}>{member.name}</span>
             <div>
@@ -48,6 +68,7 @@ export default function MemberManager() {
           </li>
         ))}
       </ul>
+      {filteredMembers.length === 0 && <p className='text-center text-gray-500 mt-4'>검색 결과가 없습니다.</p>}
     </div>
   );
 }

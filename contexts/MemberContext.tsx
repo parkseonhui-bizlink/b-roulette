@@ -1,45 +1,94 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Member } from '@/types/member';
+import { Member } from '@prisma/client';
 
 interface MemberContextType {
   members: Member[];
-  addMember: (name: string) => void;
-  removeMember: (id: string) => void;
-  toggleExclude: (id: string) => void;
+  addMember: (name: string) => Promise<void>;
+  removeMember: (id: string) => Promise<void>;
+  toggleExclude: (id: string) => Promise<void>;
+  loading: boolean;
+  error: string | null;
 }
 
 const MemberContext = createContext<MemberContextType | undefined>(undefined);
 
 export function MemberProvider({ children }: { children: React.ReactNode }) {
   const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedMembers = localStorage.getItem('members');
-    if (storedMembers) {
-      setMembers(JSON.parse(storedMembers));
-    }
+    fetchMembers();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('members', JSON.stringify(members));
-  }, [members]);
+  async function fetchMembers() {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/members');
+      if (!response.ok) throw new Error('Failed to fetch members');
+      const data = await response.json();
+      setMembers(data);
+    } catch (error) {
+      setError('Failed to fetch members');
+      console.error('Error fetching members:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  const addMember = (name: string) => {
-    setMembers((prev) => [...prev, { id: uuidv4(), name, excluded: false }]);
-  };
+  async function addMember(name: string) {
+    try {
+      const response = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (!response.ok) throw new Error('Failed to add member');
+      const newMember = await response.json();
+      setMembers([...members, newMember]);
+    } catch (error) {
+      setError('Failed to add member');
+      console.error('Error adding member:', error);
+    }
+  }
 
-  const removeMember = (id: string) => {
-    setMembers((prev) => prev.filter((member) => member.id !== id));
-  };
+  async function removeMember(id: string) {
+    try {
+      const response = await fetch('/api/members', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!response.ok) throw new Error('Failed to remove member');
+      setMembers(members.filter((member) => member.id !== id));
+    } catch (error) {
+      setError('Failed to remove member');
+      console.error('Error removing member:', error);
+    }
+  }
 
-  const toggleExclude = (id: string) => {
-    setMembers((prev) => prev.map((member) => (member.id === id ? { ...member, excluded: !member.excluded } : member)));
-  };
+  async function toggleExclude(id: string) {
+    try {
+      const memberToUpdate = members.find((member) => member.id === id);
+      if (!memberToUpdate) return;
 
-  return <MemberContext.Provider value={{ members, addMember, removeMember, toggleExclude }}>{children}</MemberContext.Provider>;
+      const response = await fetch('/api/members', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, excluded: !memberToUpdate.excluded }),
+      });
+      if (!response.ok) throw new Error('Failed to update member');
+      const updatedMember = await response.json();
+      setMembers(members.map((member) => (member.id === id ? updatedMember : member)));
+    } catch (error) {
+      setError('Failed to update member');
+      console.error('Error updating member:', error);
+    }
+  }
+
+  return <MemberContext.Provider value={{ members, addMember, removeMember, toggleExclude, loading, error }}>{children}</MemberContext.Provider>;
 }
 
 export function useMemberContext() {

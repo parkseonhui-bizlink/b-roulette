@@ -1,95 +1,135 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { useMemberContext } from '@/contexts/MemberContext';
 import WinnerOverlay from './WinnerOverlay';
 
 interface SlotMachineProps {
-  onComplete: (winner: string) => void;
+  onWinnerSelected?: (winner: string | null) => void;
 }
 
-export default function SlotMachine({ onComplete }: SlotMachineProps) {
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
   const { members } = useMemberContext();
   const [isSpinning, setIsSpinning] = useState(false);
-  const [displayNames, setDisplayNames] = useState(['?', '?', '?']);
   const [winner, setWinner] = useState<string | null>(null);
+  const [displayNames, setDisplayNames] = useState(['?', '?', '?']);
 
-  const activeMembers = members.filter((member) => !member.excluded);
+  const activeMembers = useMemo(() => members.filter((member) => !member.excluded), [members]);
+  const [shuffledMembers, setShuffledMembers] = useState(() => shuffleArray(activeMembers.map((m) => m.name)));
 
-  const getRandomName = () => {
-    const index = Math.floor(Math.random() * activeMembers.length);
-    return activeMembers[index].name;
-  };
+  useEffect(() => {
+    setShuffledMembers(shuffleArray(activeMembers.map((m) => m.name)));
+  }, [activeMembers]);
 
-  const spin = () => {
+  const spin = useCallback(async () => {
     if (isSpinning || activeMembers.length === 0) return;
 
     setIsSpinning(true);
     setWinner(null);
+    if (onWinnerSelected) onWinnerSelected(null);
 
-    const selectedWinner = getRandomName();
+    const spinDuration = 3000; // 3 seconds
+    const interval = 50; // Update every 50ms
+    const steps = spinDuration / interval;
 
-    let count = 0;
-    const maxCount = 20;
-    const interval = setInterval(() => {
-      setDisplayNames((prev) => prev.map(() => getRandomName()));
-      count++;
+    for (let i = 0; i < steps; i++) {
+      await new Promise((resolve) => setTimeout(resolve, interval));
+      setDisplayNames(shuffledMembers.slice(0, 3).map(() => shuffledMembers[Math.floor(Math.random() * shuffledMembers.length)]));
+    }
 
-      if (count >= maxCount) {
-        clearInterval(interval);
-        setDisplayNames([selectedWinner, selectedWinner, selectedWinner]);
-        setIsSpinning(false);
-        setWinner(selectedWinner);
-        onComplete(selectedWinner);
-      }
-    }, 100);
-  };
+    const randomIndex = Math.floor(Math.random() * shuffledMembers.length);
+    const selectedWinner = shuffledMembers[randomIndex];
+    setDisplayNames([selectedWinner, selectedWinner, selectedWinner]);
+    setWinner(selectedWinner);
+    setIsSpinning(false);
+    if (onWinnerSelected) onWinnerSelected(selectedWinner);
+  }, [isSpinning, activeMembers.length, shuffledMembers, onWinnerSelected]);
 
   const closeOverlay = () => {
     setWinner(null);
   };
 
-  const colors = [
-    '#FFB800', // 노란색
-    '#FF4B4B', // 빨간색
-    '#FFFFFF', // 흰색
-    '#FFB4B4', // 연한 분홍색
-  ];
+  const colors = ['#FFB800', '#FF4B4B', '#FFFFFF', '#FFB4B4'];
 
   return (
-    <div className='flex flex-col items-center gap-8'>
-      <div className='relative bg-white rounded-xl shadow-xl p-8 w-[400px]'>
-        <div className='absolute -top-2 -right-2'>
-          <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} className='w-6 h-6 bg-blue-500 rounded-full' />
-        </div>
-        <div className='absolute -bottom-2 -left-2'>
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            className='w-6 h-6 bg-yellow-500 rounded-full'
-          />
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+      <div
+        style={{
+          position: 'relative',
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          padding: '2rem',
+          width: '400px',
+        }}
+      >
+        <motion.div
+          style={{
+            position: 'absolute',
+            top: '-0.5rem',
+            right: '-0.5rem',
+            width: '1.5rem',
+            height: '1.5rem',
+            backgroundColor: '#3B82F6',
+            borderRadius: '9999px',
+          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+        />
+        <motion.div
+          style={{
+            position: 'absolute',
+            bottom: '-0.5rem',
+            left: '-0.5rem',
+            width: '1.5rem',
+            height: '1.5rem',
+            backgroundColor: '#FFB800',
+            borderRadius: '9999px',
+          }}
+          animate={{ rotate: -360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+        />
 
-        <div className='flex justify-center gap-2 mb-4'>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            marginBottom: '1rem',
+            height: '60px',
+            overflow: 'hidden',
+          }}
+        >
           {displayNames.map((name, index) => (
             <div
               key={index}
-              className='w-[100px] h-[60px] rounded-lg border-2 border-gray-200 overflow-hidden relative'
-              style={{ backgroundColor: colors[index % colors.length] }}
+              style={{
+                width: '100px',
+                height: '60px',
+                borderRadius: '0.5rem',
+                border: '2px solid #E5E7EB',
+                overflow: 'hidden',
+                position: 'relative',
+                backgroundColor: colors[index % colors.length],
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.125rem',
+                fontWeight: 700,
+                color: 'rgb(55, 65, 81)',
+              }}
             >
-              <AnimatePresence>
-                <motion.div
-                  key={name + index}
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -50, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className='absolute inset-0 flex items-center justify-center text-lg font-bold text-gray-700'
-                >
-                  {name}
-                </motion.div>
-              </AnimatePresence>
+              {name}
             </div>
           ))}
         </div>
@@ -97,7 +137,17 @@ export default function SlotMachine({ onComplete }: SlotMachineProps) {
         <motion.button
           onClick={spin}
           disabled={isSpinning || activeMembers.length === 0}
-          className='w-full bg-purple-600 text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+          style={{
+            width: '100%',
+            backgroundColor: '#8B5CF6',
+            color: 'white',
+            padding: '0.75rem',
+            borderRadius: '0.5rem',
+            fontWeight: 500,
+            transition: 'background-color 0.2s',
+            cursor: isSpinning || activeMembers.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: isSpinning || activeMembers.length === 0 ? 0.5 : 1,
+          }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >

@@ -7,8 +7,9 @@ import Link from 'next/link';
 export default function Roulette() {
   const [winner, setWinner] = useState<string | null>(null);
 
-  const handleComplete = (selectedMember: string) => {
-    setWinner(selectedMember);
+  const handleWinnerSelected = (selectedWinner: string | null) => {
+    setWinner(selectedWinner);
+    // 여기에서 필요한 추가 로직을 수행할 수 있습니다.
   };
 
   return (
@@ -19,7 +20,13 @@ export default function Roulette() {
           멤버 관리하기
         </Link>
       </div>
-      <SlotMachine onComplete={handleComplete} />
+      <SlotMachine onWinnerSelected={handleWinnerSelected} />
+      {winner && (
+        <div className='mt-8 text-center'>
+          <h2 className='text-2xl font-bold'>당첨자</h2>
+          <p className='text-xl mt-2'>{winner}</p>
+        </div>
+      )}
     </div>
   );
 }
