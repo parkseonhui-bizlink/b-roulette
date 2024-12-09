@@ -150,7 +150,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {isSpinning ? '선택 중...' : '랜덤 선택'}
+          {isSpinning ? '選択中' : 'ランダム選択'}
         </MotionButton>
       </div>
 

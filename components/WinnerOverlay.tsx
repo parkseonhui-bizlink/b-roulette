@@ -58,7 +58,7 @@ export default function WinnerOverlay({ winner, onClose }: WinnerOverlayProps) {
                 marginBottom: '1rem',
               }}
             >
-              🎉 축하합니다! 🎉
+              🎉 おめでとうございます！ 🎉
             </motion.h2>
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
@@ -77,7 +77,9 @@ export default function WinnerOverlay({ winner, onClose }: WinnerOverlayProps) {
               {winner}
             </motion.div>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} style={{ fontSize: '1.25rem' }}>
-              당신이 선택되었습니다!
+              {winner}さんが選べました！
+              <br />
+              来週の司会よろしくお願いいたします！
             </motion.p>
             <MotionButton
               whileHover={{ scale: 1.05 }}
@@ -94,7 +96,7 @@ export default function WinnerOverlay({ winner, onClose }: WinnerOverlayProps) {
               }}
               onClick={onClose}
             >
-              닫기
+              閉じる
             </MotionButton>
           </motion.div>
         </MotionDiv>
