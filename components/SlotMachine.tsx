@@ -19,12 +19,16 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
-  const { members } = useMemberContext();
+  const { members, setExclusion } = useMemberContext();
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [displayNames, setDisplayNames] = useState(['?', '?', '?']);
 
-  const activeMembers = useMemo(() => members.filter((member) => !member.excluded), [members]);
+  const activeMembers = useMemo(() => {
+    const now = new Date();
+    return members.filter((member) => !member.excludedUntil || new Date(member.excludedUntil) < now);
+  }, [members]);
+
   const [shuffledMembers, setShuffledMembers] = useState(() => shuffleArray(activeMembers.map((m) => m.name)));
 
   useEffect(() => {
@@ -42,18 +46,35 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
     const interval = 50; // Update every 50ms
     const steps = spinDuration / interval;
 
+    let currentIndex = 0;
     for (let i = 0; i < steps; i++) {
       await new Promise((resolve) => setTimeout(resolve, interval));
-      setDisplayNames(shuffledMembers.slice(0, 3).map(() => shuffledMembers[Math.floor(Math.random() * shuffledMembers.length)]));
+      setDisplayNames([
+        shuffledMembers[currentIndex % shuffledMembers.length],
+        shuffledMembers[(currentIndex + 1) % shuffledMembers.length],
+        shuffledMembers[(currentIndex + 2) % shuffledMembers.length],
+      ]);
+      currentIndex++;
     }
 
     const randomIndex = Math.floor(Math.random() * shuffledMembers.length);
     const selectedWinner = shuffledMembers[randomIndex];
     setDisplayNames([selectedWinner, selectedWinner, selectedWinner]);
     setWinner(selectedWinner);
+
+    // 30일 후의 날짜 설정
+    const exclusionDate = new Date();
+    exclusionDate.setDate(exclusionDate.getDate() + 30);
+
+    // 선택된 멤버를 30일 동안 제외
+    const selectedMember = members.find((member) => member.name === selectedWinner);
+    if (selectedMember) {
+      await setExclusion(selectedMember.id, exclusionDate);
+    }
+
     setIsSpinning(false);
     if (onWinnerSelected) onWinnerSelected(selectedWinner);
-  }, [isSpinning, activeMembers.length, shuffledMembers, onWinnerSelected]);
+  }, [isSpinning, activeMembers.length, shuffledMembers, onWinnerSelected, members, setExclusion]);
 
   const closeOverlay = () => {
     setWinner(null);
