@@ -9,7 +9,8 @@ datasource db {
 }
 
 model Member {
-  id       String  @id @default(uuid())
-  name     String
-  excluded Boolean @default(false)
+  id         String  @id @default(uuid())
+  name       String  @unique 
+  chatworkId String?
+  excluded   Boolean @default(false)
 }

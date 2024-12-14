@@ -5,7 +5,7 @@ import { Member } from '@prisma/client';
 
 interface MemberContextType {
   members: Member[];
-  addMember: (name: string) => Promise<void>;
+  addMember: (name: string, chatworkId?: string) => Promise<void>;
   removeMember: (id: string) => Promise<void>;
   toggleExclude: (id: string) => Promise<void>;
   loading: boolean;
@@ -38,12 +38,12 @@ export function MemberProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  async function addMember(name: string) {
+  async function addMember(name: string, chatworkId?: string) {
     try {
       const response = await fetch('/api/members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, chatworkId }),
       });
       if (!response.ok) throw new Error('Failed to add member');
       const newMember = await response.json();

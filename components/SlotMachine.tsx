@@ -134,11 +134,11 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           ))}
         </div>
         <MotionButton
+          className='bg-purple-600'
           onClick={spin}
           disabled={isSpinning || activeMembers.length === 0}
           style={{
             width: '100%',
-            backgroundColor: '#8B5CF6',
             color: 'white',
             padding: '0.75rem',
             borderRadius: '0.5rem',

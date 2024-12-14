@@ -9,18 +9,18 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { name } = await request.json();
+  const { name, chatworkId } = await request.json();
   const newMember = await prisma.member.create({
-    data: { name, excluded: false },
+    data: { name, chatworkId, excluded: false },
   });
   return NextResponse.json(newMember);
 }
 
 export async function PUT(request: Request) {
-  const { id, excluded } = await request.json();
+  const { id, excluded, chatworkId } = await request.json();
   const updatedMember = await prisma.member.update({
     where: { id },
-    data: { excluded },
+    data: { excluded, chatworkId },
   });
   return NextResponse.json(updatedMember);
 }

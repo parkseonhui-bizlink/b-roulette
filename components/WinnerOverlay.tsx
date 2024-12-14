@@ -77,7 +77,7 @@ export default function WinnerOverlay({ winner, onClose }: WinnerOverlayProps) {
               {winner}
             </motion.div>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} style={{ fontSize: '1.25rem' }}>
-              {winner}さんが選べました！
+              {winner}さんが選ばれました！
               <br />
               来週の司会よろしくお願いいたします！
             </motion.p>
