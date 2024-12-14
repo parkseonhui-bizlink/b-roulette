@@ -92,7 +92,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           borderRadius: '0.75rem',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
           padding: '2rem',
-          width: '400px',
+          width: '450px',
         }}
       >
         <motion.div
@@ -135,7 +135,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
             <div
               key={index}
               style={{
-                width: '100px',
+                width: '150px',
                 height: '60px',
                 borderRadius: '0.5rem',
                 border: '2px solid #E5E7EB',
