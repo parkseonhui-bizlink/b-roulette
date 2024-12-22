@@ -38,6 +38,8 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
   const spin = useCallback(async () => {
     if (isSpinning || activeMembers.length === 0) return;
 
+    const spinSound = new Audio('/sounds/spin-sound.mp3');
+
     setIsSpinning(true);
     setWinner(null);
     if (onWinnerSelected) onWinnerSelected(null);
@@ -47,6 +49,13 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
     const steps = spinDuration / interval;
 
     let currentIndex = 0;
+
+    try {
+      await spinSound.play(); // 한 번 재생
+    } catch (error) {
+      console.error('Failed to play sound:', error);
+    }
+
     for (let i = 0; i < steps; i++) {
       await new Promise((resolve) => setTimeout(resolve, interval));
       setDisplayNames([
