@@ -13,7 +13,6 @@ export default function Roulette() {
     setWinner(selectedWinner);
   };
 
-  // Chatwork 태스크 생성 API 호출
   const createChatworkTask = async () => {
     if (!winner) {
       alert('選ばれた司会者がいません！');
@@ -23,21 +22,33 @@ export default function Roulette() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/chatwork', {
+      // Chatwork API 호출
+      const chatworkResponse = await fetch('/api/chatwork', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ winner }), // winner 이름을 서버로 보냄
+        body: JSON.stringify({ winner }),
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create Chatwork task.');
+      if (!chatworkResponse.ok) {
+        const chatworkError = await chatworkResponse.json();
+        throw new Error(chatworkError.error || 'Failed to create Chatwork task.');
       }
 
-      alert('Chatworkタスクが作成されました！');
+      // Google Sheets API 호출
+      const googleSheetsResponse = await fetch('/api/google-sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ winner }),
+      });
+
+      if (!googleSheetsResponse.ok) {
+        const googleSheetsError = await googleSheetsResponse.json();
+        throw new Error(googleSheetsError.error || 'Failed to update Google Sheets.');
+      }
+
+      alert('ChatworkタスクとGoogle Sheetsが更新されました！');
     } catch (error) {
-      console.error('Failed to create task:', (error as Error).message);
+      console.error('Error:', error);
       alert((error as Error).message || 'タスク作成に失敗しました。');
     } finally {
       setLoading(false);
