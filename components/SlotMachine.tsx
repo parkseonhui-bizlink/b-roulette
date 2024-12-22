@@ -42,7 +42,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
     setWinner(null);
     if (onWinnerSelected) onWinnerSelected(null);
 
-    const spinDuration = 3000; // 3 seconds
+    const spinDuration = 6000; // 3 seconds
     const interval = 50; // Update every 50ms
     const steps = spinDuration / interval;
 
@@ -92,7 +92,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           borderRadius: '0.75rem',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
           padding: '2rem',
-          width: '450px',
+          width: '700px',
         }}
       >
         <motion.div
@@ -122,21 +122,20 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
         />
         <div
+          className='w-full'
           style={{
             display: 'flex',
             justifyContent: 'center',
             gap: '0.5rem',
             marginBottom: '1rem',
-            height: '60px',
             overflow: 'hidden',
           }}
         >
           {displayNames.map((name, index) => (
             <div
               key={index}
+              className='text-3xl w-1/3 py-4'
               style={{
-                width: '150px',
-                height: '60px',
                 borderRadius: '0.5rem',
                 border: '2px solid #E5E7EB',
                 overflow: 'hidden',
@@ -145,7 +144,6 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.125rem',
                 fontWeight: 700,
                 color: 'rgb(55, 65, 81)',
               }}
@@ -155,7 +153,7 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
           ))}
         </div>
         <MotionButton
-          className='bg-purple-600'
+          className='bg-purple-600 text-3xl'
           onClick={spin}
           disabled={isSpinning || activeMembers.length === 0}
           style={{

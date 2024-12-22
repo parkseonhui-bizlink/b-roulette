@@ -4,7 +4,7 @@ import Roulette from '@/components/Roulette';
 export default function Home() {
   return (
     <MemberProvider>
-      <main className='min-h-screen bg-gray-100 py-8'>
+      <main className='min-h-screen bg-gray-100'>
         <Roulette />
       </main>
     </MemberProvider>

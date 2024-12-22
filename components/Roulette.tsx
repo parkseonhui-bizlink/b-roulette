@@ -45,7 +45,7 @@ export default function Roulette() {
   };
 
   return (
-    <div className='max-w-2xl mx-auto p-4'>
+    <div className='max-w-2xl mx-auto h-screen flex flex-col justify-center relative top-[-5rem]'>
       <div className='text-center mb-8'>
         <h1 className='text-3xl font-bold mb-4'>司会者</h1>
         <Link href='/members' className='inline-block bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700 transition-colors'>
