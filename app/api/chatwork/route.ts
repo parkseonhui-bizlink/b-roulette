@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  const taskBody = `${winner}さん、次回の司会をお願いします！(bow)\n以下のスプレッドシートを確認してください\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?usp=sharing`;
+  const taskBody = `${winner}さん、次回の司会をお願いします！(bow)\n以下のスプレッドシートを確認してください\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?gid=518040338#gid=518040338`;
 
   const body = `body=${encodeURIComponent(taskBody)}&limit_type=none&to_ids=${member.chatworkId}`;
 
