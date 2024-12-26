@@ -9,7 +9,6 @@ export default function Roulette() {
   const [winner, setWinner] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [taskType, setTaskType] = useState<string | null>(null);
 
   // SlotMachine에서 선택된 winner를 업데이트
   const handleWinnerSelected = (selectedWinner: string | null) => {
@@ -25,7 +24,6 @@ export default function Roulette() {
   };
 
   const createChatworkTask = async (selectedType: string) => {
-    setTaskType(selectedType);
     setLoading(true);
 
     if (!winner) {
