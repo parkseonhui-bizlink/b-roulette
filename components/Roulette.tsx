@@ -3,30 +3,42 @@
 import { useState } from 'react';
 import SlotMachine from './SlotMachine'; // 랜덤 선택 컴포넌트
 import Link from 'next/link';
+import TaskTypeModal from './TaskTypeModal';
 
 export default function Roulette() {
   const [winner, setWinner] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [taskType, setTaskType] = useState<string | null>(null);
 
   // SlotMachine에서 선택된 winner를 업데이트
   const handleWinnerSelected = (selectedWinner: string | null) => {
     setWinner(selectedWinner);
   };
 
-  const createChatworkTask = async () => {
+  const openModal = () => {
     if (!winner) {
       alert('選ばれた司会者がいません！');
       return;
     }
+    setModalOpen(true);
+  };
 
+  const createChatworkTask = async (selectedType: string) => {
+    setTaskType(selectedType);
     setLoading(true);
+
+    if (!winner) {
+      alert('選ばれた司会者がいません！');
+      return;
+    }
 
     try {
       // Chatwork API 호출
       const chatworkResponse = await fetch('/api/chatwork', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ winner }),
+        body: JSON.stringify({ winner, taskType: selectedType }),
       });
 
       if (!chatworkResponse.ok) {
@@ -68,15 +80,12 @@ export default function Roulette() {
         <div className='mt-8 text-center'>
           <h2 className='text-2xl font-bold'>結果</h2>
           <p className='text-xl mt-2'>{winner}さんが選ばれました！</p>
-          <button
-            onClick={createChatworkTask}
-            className='mt-4 bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 transition-colors'
-            disabled={loading}
-          >
+          <button onClick={openModal} className='mt-4 bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 transition-colors' disabled={loading}>
             {loading ? '作成中...' : 'Chatworkタスク作成'}
           </button>
         </div>
       )}
+      <TaskTypeModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSubmit={createChatworkTask} />
     </div>
   );
 }
