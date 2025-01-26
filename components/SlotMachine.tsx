@@ -29,11 +29,11 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
     return members.filter((member) => !member.excludedUntil || new Date(member.excludedUntil) < now);
   }, [members]);
 
-  const [shuffledMembers, setShuffledMembers] = useState(() => shuffleArray(activeMembers.map((m) => m.name)));
+  const [shuffledMembers, setShuffledMembers] = useState<string[]>([]);
 
   useEffect(() => {
-    setShuffledMembers(shuffleArray(activeMembers.map((m) => m.name)));
-  }, [activeMembers]);
+    setShuffledMembers(shuffleArray(members.map((m) => m.name)));
+  }, [members]);
 
   const spin = useCallback(async () => {
     if (isSpinning || activeMembers.length === 0) return;
@@ -66,10 +66,23 @@ export default function SlotMachine({ onWinnerSelected }: SlotMachineProps) {
       currentIndex++;
     }
 
-    const randomIndex = Math.floor(Math.random() * shuffledMembers.length);
-    const selectedWinner = shuffledMembers[randomIndex];
-    setDisplayNames([selectedWinner, selectedWinner, selectedWinner]);
+    let selectedWinner: string | null = null;
+    do {
+      const randomIndex = Math.floor(Math.random() * shuffledMembers.length);
+      selectedWinner = shuffledMembers[randomIndex];
+
+      // 활성 멤버인지 확인
+      const isActive = activeMembers.some((member) => member.name === selectedWinner);
+      if (isActive) break; // 활성 멤버라면 선택 완료
+    } while (true);
+
+    setDisplayNames([selectedWinner!, selectedWinner!, selectedWinner!]);
     setWinner(selectedWinner);
+
+    // const randomIndex = Math.floor(Math.random() * shuffledMembers.length);
+    // const selectedWinner = shuffledMembers[randomIndex];
+    // setDisplayNames([selectedWinner, selectedWinner, selectedWinner]);
+    // setWinner(selectedWinner);
 
     // 30일 후의 날짜 설정
     const exclusionDate = new Date();
