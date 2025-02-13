@@ -33,13 +33,13 @@ export async function POST(request: Request) {
   let taskBody = '';
   switch (taskType) {
     case 'type1':
-      taskBody = `${winner}さん、次回の司会をお願いします！(bow)\n⭐️朝会開始の5分前までに休憩スペースに集まっていただけますようお願いいたします！⭐️\n\n以下のスプレッドシートを確認してください\n\n▼朝会タイムテーブル\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?gid=839297873#gid=839297873`;
+      taskBody = `${winner}さん、次回の司会をお願いします！(bow)\n⭐️朝会開始の5分前までに休憩スペースに集まっていただけますようお願いいたします！⭐️\n\n以下のスプレッドシートを確認してください\n▼朝会タイムテーブル\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?gid=839297873#gid=839297873`;
       break;
     case 'type2':
-      taskBody = `${winner}さん、月初の司会をお願いいたします！(bow)\n⭐️朝会開始の5分前までに休憩スペースに集まっていただけますようお願いいたします！⭐️\n\n以下のスプレッドシートを確認してください\n\n▼月初タイムテーブル\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?gid=518040338#gid=518040338`;
+      taskBody = `${winner}さん、月初の司会をお願いいたします！(bow)\n⭐️朝会開始の5分前までに休憩スペースに集まっていただけますようお願いいたします！⭐️\n\n以下のスプレッドシートを確認してください\n▼月初タイムテーブル\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?gid=518040338#gid=518040338`;
       break;
     case 'type3':
-      taskBody = `${winner}さん、月末の司会をお願いいたします！(bow)\n⭐️朝会開始の5分前までに休憩スペースに集まっていただけますようお願いいたします！⭐️\n\n以下のスプレッドシートを確認してください\n\n▼月末タイムテーブル\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?gid=790912625#gid=790912625`;
+      taskBody = `${winner}さん、月末の司会をお願いいたします！(bow)\n⭐️朝会開始の5分前までに休憩スペースに集まっていただけますようお願いいたします！⭐️\n\n以下のスプレッドシートを確認してください\n▼月末タイムテーブル\nhttps://docs.google.com/spreadsheets/d/1D0PodSNye0jou5fpnDRNC0MxA2M4LpyVs9UDvxjvAOk/edit?gid=790912625#gid=790912625`;
       break;
     default:
       return NextResponse.json({ error: 'Invalid task type' }, { status: 400 });
